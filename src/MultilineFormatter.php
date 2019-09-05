@@ -9,10 +9,9 @@ use Monolog\Formatter\LineFormatter as BaseLineFormatter;
  * с отступом для удобного разбора.
  * 
  * Первая строка записи начинается с метки времени, заключенной в
- * квадратые скобки, а многострочный текст сообщения вытягивается
- * в одну строку. Со второй строки с отступом распечатывается в
- * удобочтаемом виде структура контекста и ниже дополнительные
- * данные записи.
+ * квадратые скобки. Многострочный текст сообщения распечатывается с отступом в
+ * удобочтаемом виде. После сообщения так же с отступом распечатывается 
+ * структура контекста и дополнительные данные записи.
  */
 class MultilineFormatter extends BaseLineFormatter
 {
@@ -24,7 +23,7 @@ class MultilineFormatter extends BaseLineFormatter
     {
         parent::__construct(static::SIMPLE_FORMAT, static::DATE_FORMAT, false, true);
         $this->includeStacktraces();
-        $this->allowInlineLineBreaks(false);
+        $this->allowInlineLineBreaks(true);
     }
 
     public function format(array $record)
@@ -41,10 +40,10 @@ class MultilineFormatter extends BaseLineFormatter
 
         $extraStr = $extra ? "\n" . $this->stringifyIndented($this->normalize($extra), self::INDENT_STRING) : '';
 
-        return $str . $extraStr . "\n";
+        return $this->stringifyIndented($str, self::INDENT_STRING, '') . $extraStr . "\n";
     }
 
-    private function stringifyIndented($data, $indentation = '')
+    private function stringifyIndented($data, $indentation = '', $leadingIndentation = null)
     {
         if (null === $data || is_bool($data)) {
             $string = var_export($data, true);
@@ -70,11 +69,16 @@ class MultilineFormatter extends BaseLineFormatter
             $string = '[' . gettype($data) . ']';
         }
 
-        return $this->indent($string, $indentation) . "\n";
+        return $this->indent($string, $indentation, $leadingIndentation) . "\n";
     }
 
-    private function indent($string, $indentation)
+    private function indent($string, $indentation, $leadingIndentation = null)
     {
-        return $indentation . str_replace(["\r\n", "\n"], ["\n", "\n" . $indentation], trim($string));
+        return (null === $leadingIndentation ? $indentation : $leadingIndentation)
+            . str_replace(
+                ["\r\n", "\n"],
+                ["\n", "\n" . $indentation],
+                trim($string)
+            );
     }
 }
