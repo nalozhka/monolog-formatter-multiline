@@ -128,7 +128,12 @@ class MultilineFormatter extends BaseLineFormatter
             } else { // ассоциативный массив
                 $nestedIndent = $indentation . '  ';
                 foreach ($data as $key => $value) {
-                    $string .= $indentation . $key . ":\n" . $this->stringifyIndented($value, $nestedIndent);
+                    $strValue = $this->stringifyIndented($value, $nestedIndent);
+                    if (false !== strpos(rtrim($strValue), "\n")) {
+                        $string .= $indentation . $key . ":\n" . $strValue;
+                    } else {
+                        $string .= $indentation . $key . ': ' . substr($strValue, strlen($nestedIndent));
+                    }
                 }
             }
 
