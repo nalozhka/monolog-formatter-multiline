@@ -52,12 +52,12 @@ class MultilineFormatter extends BaseLineFormatter
             );
         }
 
-        $data = array(
-            'class' => Utils::getClass($e),
-            'message' => $e->getMessage(),
-            'code' => $e->getCode(),
-            'file' => $e->getFile() . ':' . $e->getLine(),
-        );
+        $data = [
+                'class' => Utils::getClass($e),
+                'message' => $e->getMessage(),
+                'code' => $e->getCode(),
+                'file' => $e->getFile() . ':' . $e->getLine(),
+            ] + $this->getPublicPropertiesException($e);
 
         if ($this->includeStacktraces) {
             $trace = $e->getTrace();
@@ -82,6 +82,18 @@ class MultilineFormatter extends BaseLineFormatter
         }
 
         return $data;
+    }
+
+    protected function getPublicPropertiesException(\Throwable $exception): array
+    {
+        $class = new \ReflectionClass($exception);
+        $publicProperties = $class->getProperties(\ReflectionProperty::IS_PUBLIC);
+
+        foreach ($publicProperties as $property) {
+            $results[$property->getName()] = $this->normalize($exception->{$property->getName()});
+        }
+
+        return $results ?? [];
     }
 
     private function stringifyCallArgs(array $args)
