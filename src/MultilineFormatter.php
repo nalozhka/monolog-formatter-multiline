@@ -66,7 +66,7 @@ class MultilineFormatter extends BaseLineFormatter
                 $idx = sprintf('#%02u', $traceLen - $idx);
                 if (isset($frame['file'])) {
                     $args = isset($frame['args']) ? $this->stringifyCallArgs($frame['args']) : '';
-                    $call = (isset($frame['class']) ? $frame['class'] . $frame['type'] : '') . $frame['function'] . '(' . $args . ')';
+                    $call = (isset($frame['class']) ? $frame['class'] . $frame['type'] : '') . (!empty($frame['function']) ? $frame['function'] : '') . '(' . $args . ')';
                     $data['trace'][$idx] = $call . ' в ' . $frame['file'] . ':' . $frame['line'];
                 } elseif (isset($frame['function']) && $frame['function'] === '{closure}') {
                     $data['trace'][$idx] = $frame['function'];
