@@ -41,7 +41,9 @@ class MultilineFormatter extends BaseLineFormatter
 
         $extraStr = $extra ? "\n" . $this->stringifyIndented($this->normalize($extra), self::INDENT_STRING) : '';
 
-        return $this->stringifyIndented($str, self::INDENT_STRING, '') . $extraStr . "\n";
+        $formatted = $this->stringifyIndented($str, self::INDENT_STRING, '') . $extraStr;
+
+        return trim($formatted, "\n") . "\n";
     }
 
     protected function normalizeException($e)
